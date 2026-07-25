@@ -5,7 +5,7 @@ import {
 } from "react-icons/md";
 import QRCode from "qrcode";
 import { useAppContext } from "../context/AppContext";
-import { settingsAPI } from "../services/api";
+import { settingsAPI, setApiUrl, getApiUrl } from "../services/api";
 import { toast } from "react-toastify";
 
 /* ─── tiny image-upload card ─────────────────────────────── */
@@ -157,6 +157,7 @@ function Settings() {
     SENDGRID_API_KEY: "",
     SENDGRID_FROM_EMAIL: ""
   });
+  const [frontendApiUrl, setFrontendApiUrl] = useState(getApiUrl());
   const [saved, setSaved]       = useState(false);
   const [qrPreview, setQrPreview] = useState(null);
   // Local copies of image URLs so UI updates immediately after upload
@@ -209,6 +210,7 @@ function Settings() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setApiUrl(frontendApiUrl);
     await saveSettings(form);
     try {
       const res = await settingsAPI.updateEnv(dbEnv);
@@ -355,6 +357,28 @@ function Settings() {
               <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 6 }}>
                 This email must be verified in your SendGrid account as a Sender.
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Frontend Configuration ── */}
+        <div className="section-card">
+          <div className="section-card-header">
+            <span className="section-card-title">
+              <MdInfo style={{ color: "var(--primary)" }} /> Frontend Configuration
+            </span>
+          </div>
+          <div className="section-card-body">
+            <div className="alert alert-info" style={{ marginBottom: 20 }}>
+              <MdInfo />
+              <span>
+                If you have hosted your backend live (e.g. on Render), you can paste the live backend URL here so this frontend connects to it.
+              </span>
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Live Backend API URL</label>
+              <input className="form-control" type="url" value={frontendApiUrl} onChange={(e) => setFrontendApiUrl(e.target.value)}
+                placeholder="https://your-backend.onrender.com/api" />
             </div>
           </div>
         </div>

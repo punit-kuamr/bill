@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+export const getApiUrl = () => {
+  return localStorage.getItem('BACKEND_API_URL') || process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+};
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: getApiUrl(),
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 });
@@ -20,6 +22,16 @@ api.interceptors.response.use(
     return Promise.reject(new Error(message));
   }
 );
+
+export const setApiUrl = (url) => {
+  if (url) {
+    localStorage.setItem('BACKEND_API_URL', url);
+    api.defaults.baseURL = url;
+  } else {
+    localStorage.removeItem('BACKEND_API_URL');
+    api.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+  }
+};
 
 // ============================================================
 // CLIENT API
@@ -47,7 +59,7 @@ export const invoiceAPI = {
   markPaid:    (id, data) => api.post(`/invoices/${id}/mark-paid`, data),
   markUnpaid:  (id)     => api.post(`/invoices/${id}/mark-unpaid`),
   nextNumber:  ()       => api.get('/invoices/next-number'),
-  downloadPDF: (id)     => `${API_URL}/invoices/${id}/pdf`,
+  downloadPDF: (id)     => `${api.defaults.baseURL}/invoices/${id}/pdf`,
   getRecycleBin: ()     => api.get('/invoices/recycle-bin'),
   restore:     (id)     => api.post(`/invoices/${id}/restore`),
   permanentDelete: (id) => api.delete(`/invoices/${id}/permanent`),
