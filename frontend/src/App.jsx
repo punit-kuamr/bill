@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { MdMenu } from 'react-icons/md';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Invoices from './pages/Invoices';
@@ -13,11 +14,19 @@ import ClientForm from './pages/ClientForm';
 import './App.css';
 
 function App() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <BrowserRouter>
       <div className="app-container">
-        <Sidebar />
+        <Sidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
         <main className="main-content">
+          <div className="mobile-header">
+            <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>
+              <MdMenu />
+            </button>
+            <div className="mobile-header-title">InvoiceFlow</div>
+          </div>
           <Routes>
             <Route path="/"                  element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard"         element={<Dashboard />} />

@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   MdDashboard, MdReceipt, MdAddBox, MdPeople,
-  MdPayment, MdBarChart, MdSettings, MdDeleteOutline
+  MdPayment, MdBarChart, MdSettings, MdDeleteOutline, MdClose
 } from 'react-icons/md';
 import { useAppContext } from '../context/AppContext';
 import './Sidebar.css';
@@ -18,24 +18,34 @@ const navItems = [
   { path: '/settings', label: 'Settings', icon: <MdSettings />, section: 'SYSTEM' },
 ];
 
-function Sidebar() {
+function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const { stats, settings } = useAppContext();
 
   const unpaidCount = stats?.unpaid_count || 0;
 
   return (
-    <aside className="sidebar">
-      {/* Brand */}
-      <div className="sidebar-brand">
-        <div className="brand-logo">
-          <div className="brand-icon">📊</div>
-          <div className="brand-text">
-            <h2>InvoiceFlow</h2>
-            <span>Invoice Manager</span>
+    <>
+      {/* Mobile Overlay */}
+      <div 
+        className={`sidebar-overlay ${isOpen ? 'show' : ''}`} 
+        onClick={onClose}
+      />
+      
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        {/* Brand */}
+        <div className="sidebar-brand">
+          <div className="brand-logo">
+            <div className="brand-icon">📊</div>
+            <div className="brand-text">
+              <h2>InvoiceFlow</h2>
+              <span>Invoice Manager</span>
+            </div>
+            <button className="mobile-close-btn" onClick={onClose}>
+              <MdClose />
+            </button>
           </div>
         </div>
-      </div>
 
       {/* Navigation */}
       <nav className="sidebar-nav">
@@ -50,6 +60,7 @@ function Sidebar() {
               )}
               <NavLink
                 to={item.path}
+                onClick={onClose}
                 className={({ isActive }) => {
                   // For "Create Invoice", only active on exact path
                   if (item.path === '/invoices/new') {
@@ -89,7 +100,8 @@ function Sidebar() {
         </div>
         <div className="version-tag">InvoiceFlow v1.0 </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
 
