@@ -1,0 +1,81 @@
+// ============================================================
+// INVOICE MANAGEMENT SYSTEM - Express Backend
+// Author: Ankit Infotech And Solution
+// ============================================================
+
+require('dotenv').config()
+const express    = require('express');
+const cors       = require('cors');
+const helmet     = require('helmet');
+const { Pool }   = require('pg');
+const sgMail     = require('@sendgrid/mail');
+const puppeteer  = require('puppeteer');
+const QRCode     = require('qrcode');
+
+const app  = express();
+const PORT = process.env.PORT || 3000;
+
+// ============================================================
+// MIDDLEWARE
+// ============================================================
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({
+  origin: '*',
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// ============================================================
+// DATABASE
+// ============================================================
+const pool = new Pool({
+  host:     process.env.DB_HOST     || 'localhost',
+  user:     process.env.DB_USER     || 'postgres',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME     || 'postgres',
+  port:     parseInt(process.env.DB_PORT || '5432'),
+  ssl:      process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
+
+pool.on('error', (err) => {
+  console.error('Unexpected DB pool error:', err.message);
+});
+
+// Test DB connection on startup
+pool.query('SELECT NOW()')
+  .then(() => console.log(`✅ Database connected: ${process.env.DB_HOST || 'localhost'}`))
+  .catch(err => console.warn('⚠️  Database not connected:', err.message));
+
+// ============================================================
+// SENDGRID
+// ============================================================
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount || 0);
+};
+
+const generateInvoiceNumber = async () => {
+  const setRes  = await pool.query('SELECT invoice_prefix FROM settings WHERE id=1');
+  const prefix  = setRes.rows[0]?.invoice_prefix || 'INV';
+  const year    = new Date().getFullYear();
+  
+  const invRes = await pool.query(
+    "SELECT invoice_number FROM invoices WHERE invoice_number LIKE $1",
+    [`${prefix}-${year}-%`]
+  );
+  
+  const existingNumbers = invRes.rows
+    .map(r => parseInt(r.invoice_number.split('-').pop(), 10))
+    .filter(n => !isNaN(n))
+    .s
