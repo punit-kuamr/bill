@@ -7,7 +7,7 @@ export const getApiUrl = () => {
 const api = axios.create({
   baseURL: getApiUrl(),
   headers: { 'Content-Type': 'application/json' },
-  timeout: 15000,
+  timeout: 30000,
 });
 
 // Response interceptor for error normalization
