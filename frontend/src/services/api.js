@@ -7,7 +7,7 @@ export const getApiUrl = () => {
 const api = axios.create({
   baseURL: getApiUrl(),
   headers: { 'Content-Type': 'application/json' },
-  timeout: 30000,
+  timeout: 60000, // 60 seconds for PDF generation + email sending
 });
 
 // Response interceptor for error normalization
