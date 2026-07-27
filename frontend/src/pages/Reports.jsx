@@ -233,9 +233,7 @@ function Reports() {
             value={endDate} 
             onChange={e => setEndDate(e.target.value)} 
           />
-          <button className="btn btn-secondary" onClick={() => window.print()} disabled={loading}>
-            <MdPrint /> Print / Save PDF
-          </button>
+          
           <button className="btn btn-secondary" onClick={handleDownloadCSV} disabled={loading || (tab === 'monthly' && !monthly.length) || (tab === 'clients' && !clients.length) || (tab === 'unpaid' && !unpaid.length) || (tab === 'aging' && !unpaid.length) || (tab === 'paid' && !paid.length) || (tab === 'all_invoices' && !allInvoices.length)}>
             <MdDownload /> Export CSV
           </button>
