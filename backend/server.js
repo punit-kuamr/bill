@@ -1406,7 +1406,7 @@ const generateInvoicePDF = async (invoiceId) => {
 </body></html>`;
 
   const browser = await puppeteer.launch({
-    headless: 'new',
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
   try {
@@ -1494,7 +1494,11 @@ app.post('/api/emails/send-invoice', async (req, res) => {
     res.json({ message: 'Invoice sent successfully', invoice_number: inv.invoice_number });
   } catch (err) {
     console.error('Email error:', err.message);
-    res.status(500).json({ error: 'Failed to send email', message: err.message });
+    if (err.response && err.response.body) {
+      console.error('SendGrid response:', JSON.stringify(err.response.body, null, 2));
+    }
+    const detailMsg = err.response?.body?.errors?.[0]?.message || err.message;
+    res.status(500).json({ error: 'Failed to send email', message: detailMsg });
   }
 });
 
