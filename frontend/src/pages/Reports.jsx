@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MdPeople, MdWarning, MdTrendingUp, MdRefresh, MdCheckCircle, MdDownload, MdList, MdKeyboardArrowDown, MdKeyboardArrowUp, MdPrint, MdReceipt, MdInventory, MdAccessTime } from 'react-icons/md';
+import { MdPeople, MdWarning, MdTrendingUp, MdRefresh, MdCheckCircle, MdDownload, MdList, MdKeyboardArrowDown, MdKeyboardArrowUp, MdReceipt, MdInventory, MdAccessTime } from 'react-icons/md';
 import { format, parseISO } from 'date-fns';
 import { reportAPI, invoiceAPI } from '../services/api';
 import { toast } from 'react-toastify';
